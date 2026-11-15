@@ -32,6 +32,14 @@ button{font-family:inherit;cursor:pointer}input,textarea{font-family:inherit}
 .guide-body .warn{background:#FFF1D6;border:1.5px solid #E3A008;border-radius:12px;padding:9px 11px;margin:8px 0;font-size:13px;line-height:1.75}
 .guide-body .step-num{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11.5px;font-weight:900;vertical-align:-5px;margin-right:2px}
 .guide-close{margin-top:12px}
+.mig-code{word-break:break-all;font-size:12px;line-height:1.55;background:#FFFBF4}
+.mig-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.mig-actions .btn{flex:1 1 140px;width:auto}
+.mig-msg{font-size:12.5px;line-height:1.7;margin-top:8px}
+.mig-msg.err{color:#B03A2E;font-weight:700}
+.mig-msg.ok{color:var(--green);font-weight:700}
+.mig-confirm{display:none;background:#FFF1D6;border:1.5px solid #E3A008;border-radius:12px;padding:10px 12px;margin-top:10px;font-size:13px;line-height:1.75}
+.mig-confirm.show{display:block}
 .page{display:none;max-width:720px;margin:0 auto;padding:12px 16px 8px}.page.active{display:block}
 .card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
 .kome-band{display:flex;gap:12px;align-items:center;background:linear-gradient(135deg,#FFF3D6,#FFE3C2);border:1.5px solid #F5C97B;border-radius:18px;padding:12px;margin-bottom:12px;overflow:hidden}
@@ -247,6 +255,48 @@ nav.tabs button{font-size:11.5px;padding:8px 1px}
       <li><b>データが本当に消えてしまった</b> → バックアップファイルを書き出してあれば、「語群」タブ下の「データを読み込む」で元に戻せます。</li>
     </ul>
     <button type="button" class="btn sub guide-close" onclick="toggleGuide(true)">ガイドを閉じる</button>
+  </div>
+</div>
+
+<div class="guide" id="migrateGuide">
+  <button type="button" class="guide-head" id="migrateHead" aria-expanded="false" aria-controls="migrateBody" onclick="toggleMigrate()">
+    <span class="guide-toprow"><span class="guide-title">📦 データの引っ越し</span><span class="guide-chevron" aria-hidden="true">▽</span></span>
+    <span class="guide-teaser">アドレス変更でも、データをそのまま運べるよ。 <span class="guide-cta" id="migrateCta">タップで開く</span></span>
+  </button>
+  <div class="guide-body" id="migrateBody">
+    <h4>🚚 引っ越しのしかた（3ステップ）</h4>
+    <p><span class="step-num">1</span> <b>前のアドレスでコードを作る：</b>今まで使っていたアドレスでこのページを開いて、下の「引っ越しコードを作る」を押してね。</p>
+    <p><span class="step-num">2</span> <b>新しいアドレスを開く：</b>コードをコピーしたら、新しいアドレスでこのページを開いてね。</p>
+    <p><span class="step-num">3</span> <b>コードを貼って読み込む：</b>新しいアドレス側でコードを貼って「このコードで読み込む」を押せば、お引っ越し完了だよ。</p>
+
+    <h4>⬆️ 書き出し（コードを作る）</h4>
+    <p>今このアドレスに保存されているデータを、まるごと「引っ越しコード」に変えます。コードは少し長いけど、そのまま全部コピーしてね。</p>
+    <button type="button" class="btn" onclick="createMigCode()">📦 引っ越しコードを作る</button>
+    <div class="mig-msg" id="migExportMsg" role="status"></div>
+    <label class="label" for="migExportCode" style="display:block;margin-top:10px">引っ越しコード</label>
+    <textarea id="migExportCode" class="mig-code" rows="4" readonly placeholder="ここに引っ越しコードが出ます"></textarea>
+    <div class="mig-actions">
+      <button type="button" class="btn sub" onclick="copyMigCode()">📋 コードをコピー</button>
+      <button type="button" class="btn sub" onclick="saveMigFile()">💾 ファイルで保存</button>
+    </div>
+
+    <h4>⬇️ 読み込み（コードを貼る）</h4>
+    <p>前のアドレスで作ったコードを、下に貼り付けてね。ファイルで保存した人は、そのファイルを選んでも読み込めます。</p>
+    <label class="label" for="migImportCode" style="display:block">引っ越しコードを貼る</label>
+    <textarea id="migImportCode" class="mig-code" rows="4" placeholder="KONDATE1: から始まるコードをここに貼ってね"></textarea>
+    <div class="mig-actions">
+      <button type="button" class="btn" onclick="importMigCode()">📥 このコードで読み込む</button>
+    </div>
+    <label class="btn sub file-label" style="margin-top:8px">📂 ファイルから読み込む（.json / .txt）<input type="file" id="migImportFile" accept=".json,.txt,application/json,text/plain" style="display:none" onchange="importMigFile(this)"></label>
+    <div class="mig-msg" id="migImportMsg" role="status"></div>
+    <div class="mig-confirm" id="migConfirm">
+      <p style="margin:0 0 8px"><b>今のデータは上書きされます。</b><br>読み込んだデータで、今このアドレスに保存されている献立や記録が置き換わります。よければ「上書きして読み込む」を押してね。</p>
+      <div class="mig-actions" style="margin-top:0">
+        <button type="button" class="btn" onclick="confirmMigImport()">上書きして読み込む</button>
+        <button type="button" class="btn sub" onclick="cancelMigImport()">やめる</button>
+      </div>
+    </div>
+    <button type="button" class="btn sub guide-close" onclick="toggleMigrate(true)">閉じる</button>
   </div>
 </div>
 
@@ -520,6 +570,21 @@ function save(){try{localStorage.setItem('kondate-planner-v1',JSON.stringify(sta
 function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(function(){t.style.display='none'},2200)}
 function toggleGuide(closeOnly){var g=document.getElementById('firstGuide');if(!g)return;var willOpen=closeOnly?false:!g.classList.contains('open');g.classList.toggle('open',willOpen);var h=document.getElementById('guideHead');if(h)h.setAttribute('aria-expanded',willOpen?'true':'false');var c=document.getElementById('guideCta');if(c)c.textContent=willOpen?'タップで長文ガイドを閉じる':'タップで長文ガイドを開く';if(closeOnly)g.scrollIntoView({block:'start',behavior:'smooth'})}
+function toggleMigrate(closeOnly){var g=document.getElementById('migrateGuide');if(!g)return;var willOpen=closeOnly?false:!g.classList.contains('open');g.classList.toggle('open',willOpen);var h=document.getElementById('migrateHead');if(h)h.setAttribute('aria-expanded',willOpen?'true':'false');var c=document.getElementById('migrateCta');if(c)c.textContent=willOpen?'タップで閉じる':'タップで開く';if(closeOnly)g.scrollIntoView({block:'start',behavior:'smooth'})}
+var MIG_KEY='kondate-planner-v1';var migPendingJson=null;
+function migB64Encode(str){return btoa(unescape(encodeURIComponent(str)))}
+function migB64Decode(b64){return decodeURIComponent(escape(atob(b64)))}
+function migSetMsg(id,text,kind){var el=document.getElementById(id);if(!el)return;el.textContent=text||'';el.className='mig-msg'+(kind?' '+kind:'')}
+function migRawData(){try{return localStorage.getItem(MIG_KEY)}catch(e){return null}}
+function createMigCode(){var raw=migRawData();var out=document.getElementById('migExportCode');if(!raw){if(out)out.value='';migSetMsg('migExportMsg','まだ保存されたデータがないみたい。献立を1つ決めてから、もう一度試してみてね。','err');return}try{JSON.parse(raw)}catch(e){if(out)out.value='';migSetMsg('migExportMsg','保存されたデータをうまく読めなかったよ。いつもの開き方で開き直して、もう一度試してみてね。','err');return}if(out)out.value='KONDATE1:'+migB64Encode(raw);migSetMsg('migExportMsg','引っ越しコードができたよ！下の「コードをコピー」で全部コピーして、新しいアドレスに貼ってね。','ok')}
+function copyMigCode(){var ta=document.getElementById('migExportCode');if(!ta||!ta.value){migSetMsg('migExportMsg','先に「引っ越しコードを作る」を押してね。','err');return}function fallback(){ta.focus();ta.select();try{ta.setSelectionRange(0,ta.value.length)}catch(e){}migSetMsg('migExportMsg','コードを選択したよ。そのままコピーして使ってね。','ok')}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(ta.value).then(function(){migSetMsg('migExportMsg','コードをコピーしたよ！新しいアドレスに貼ってね。','ok');toast('コードをコピーしたよ 📋')},function(){fallback()})}else{fallback()}}
+function saveMigFile(){var raw=migRawData();if(!raw){migSetMsg('migExportMsg','まだ保存されたデータがないみたい。献立を1つ決めてから、もう一度試してみてね。','err');return}var pretty=raw;try{pretty=JSON.stringify(JSON.parse(raw),null,2)}catch(e){}var blob=new Blob([pretty],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kondate-backup.json';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},400);migSetMsg('migExportMsg','ファイルで保存したよ。大事に保管してね。','ok');toast('ファイルを保存したよ 💾')}
+function parseMigInput(text){var t=String(text||'').trim();if(!t)throw new Error('empty');var jsonStr=t;if(t.indexOf('KONDATE1:')===0){var b64=t.slice('KONDATE1:'.length).replace(/\s+/g,'');if(!b64)throw new Error('empty-code');jsonStr=migB64Decode(b64)}var obj=JSON.parse(jsonStr);if(!obj||typeof obj!=='object'||Array.isArray(obj))throw new Error('not-object');return{obj:obj,json:JSON.stringify(obj)}}
+function requestMigImport(parsed){migPendingJson=parsed.json;var box=document.getElementById('migConfirm');if(box)box.classList.add('show');migSetMsg('migImportMsg','コードを確認できたよ。内容で上書きしてよいか、下で確認してね。','ok');if(box)box.scrollIntoView({block:'nearest',behavior:'smooth'})}
+function importMigCode(){var ta=document.getElementById('migImportCode');var box=document.getElementById('migConfirm');if(box)box.classList.remove('show');migPendingJson=null;if(!ta||!ta.value.trim()){migSetMsg('migImportMsg','コードを貼ってから「このコードで読み込む」を押してね。','err');return}try{var parsed=parseMigInput(ta.value);requestMigImport(parsed)}catch(e){migPendingJson=null;migSetMsg('migImportMsg','うまく読み込めなかったよ。コードが途中で切れていないか、前のアドレスで作ったコードかどうか確認してね。今のデータはそのまま残っているよ。','err')}}
+function importMigFile(inp){var f=inp.files&&inp.files[0];if(!f)return;var box=document.getElementById('migConfirm');if(box)box.classList.remove('show');migPendingJson=null;var r=new FileReader();r.onload=function(){try{var parsed=parseMigInput(r.result);requestMigImport(parsed)}catch(e){migPendingJson=null;migSetMsg('migImportMsg','そのファイルは読み込めなかったよ。「ファイルで保存」で作ったファイルか、引っ越しコードのファイルか確認してね。今のデータはそのまま残っているよ。','err')}};r.onerror=function(){migSetMsg('migImportMsg','ファイルを開けなかったよ。もう一度選んでみてね。','err')};r.readAsText(f);inp.value=''}
+function confirmMigImport(){if(!migPendingJson){migSetMsg('migImportMsg','先にコードかファイルを読み込んでね。','err');return}try{localStorage.setItem(MIG_KEY,migPendingJson)}catch(e){migSetMsg('migImportMsg','保存できなかったよ。ブラウザの空きや設定を確認して、もう一度試してみてね。','err');return}try{sessionStorage.setItem('kondate-migrated','1')}catch(e){}location.reload()}
+function cancelMigImport(){migPendingJson=null;var box=document.getElementById('migConfirm');if(box)box.classList.remove('show');migSetMsg('migImportMsg','読み込みをやめたよ。今のデータはそのまま残っているよ。','')}
 function confetti(n){var c=document.getElementById('confetti');var cols=['#E86A2C','#F5A623','#3A9A6B','#FF5D7A','#4A90D9'];for(var i=0;i<(n||36);i++){var el=document.createElement('i');el.style.left=Math.random()*100+'vw';el.style.background=cols[i%5];el.style.animationDuration=(0.9+Math.random()*0.9)+'s';c.appendChild(el);(function(x){setTimeout(function(){x.remove()},2200)})(el)}}
 function go(btn){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});document.getElementById(btn.dataset.pg).classList.add('active');document.querySelectorAll('nav.tabs button').forEach(function(b){b.classList.remove('on')});btn.classList.add('on');window.scrollTo(0,0);if(btn.dataset.pg==='pg-shop')renderShop();if(btn.dataset.pg==='pg-fridge')renderFridge();updateTabKome()}
 function updateTabKome(){document.querySelectorAll('.tab-kome').forEach(function(s){var pg=s.parentElement.dataset.pg;var e=s.dataset.expr;if(pg==='pg-rec')e=(state&&state.mode==='night')?'sleepy':'star';s.innerHTML=KOME(e)})}
@@ -676,6 +741,7 @@ document.getElementById('komeHist').onclick=function(){document.getElementById('
 updateTabKome();
 var ms=document.getElementById('monthSel');for(var i=1;i<=12;i++){var o=document.createElement('option');o.value=i;o.textContent=i+'月';ms.appendChild(o)}ms.value=new Date().getMonth()+1;
 renderAll();
+try{if(sessionStorage.getItem('kondate-migrated')==='1'){sessionStorage.removeItem('kondate-migrated');setTimeout(function(){toast('引っ越しが完了しました 🎉')},350)}}catch(e){}
 </script>
 </body>
 </html>
