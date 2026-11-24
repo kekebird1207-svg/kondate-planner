@@ -4,7 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light">
-<link rel="icon" href="data:,">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#FFF8EF">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="こんだて">
 <title>Kondate Planner</title>
 <style>
 :root{--bg:#FFF8EF;--card:#fff;--ink:#2B2118;--sub:#7A6A5E;--accent:#E86A2C;--accent2:#F5A623;--line:#F0DDC8;--green:#3A9A6B;--radius:18px}
@@ -368,6 +375,7 @@ nav.tabs button{font-size:11.5px;padding:8px 1px}
 <nav class="tabs"><button class="on" data-pg="pg-plan" onclick="go(this)"><span class="tab-kome" data-expr="think"></span>🍱<br>献立</button><button data-pg="pg-rec" onclick="go(this)"><span class="tab-kome" data-expr="star"></span>💡<br>おすすめ</button><button data-pg="pg-shop" onclick="go(this)"><span class="tab-kome" data-expr="happy"></span>🛒<br>買い物</button><button data-pg="pg-fridge" onclick="go(this)"><span class="tab-kome" data-expr="happy"></span>🧊<br>冷蔵庫</button><button data-pg="pg-hist" onclick="go(this)"><span class="tab-kome" data-expr="happy"></span>📖<br>記録</button><button data-pg="pg-words" onclick="go(this)"><span class="tab-kome" data-expr="think"></span>🔤<br>語群</button></nav>
 <div class="recipe-overlay" id="recipeOverlay"><div class="recipe-card"><button class="rc-close" onclick="closeRecipe()" aria-label="閉じる">✕</button><h2 id="rcTitle"></h2><div class="rc-meta" id="rcMeta">材料は2人分の目安です</div><div id="rcKcal" style="margin-top:8px"></div><h3>🧺 材料</h3><ul class="rc-ing" id="rcIng"></ul><h3>🍳 作り方</h3><ol class="rc-steps" id="rcSteps"></ol><button class="btn" style="margin-top:14px" onclick="setFromRecipe()">🍱 今日の主菜にする</button><button class="btn sub" style="margin-top:8px" onclick="closeRecipe()">閉じる</button></div></div>
 <div class="celeb-overlay" id="celebOverlay"><div class="celeb-card"><div class="celeb-kome bob" id="celebKome"></div><h2 id="celebTitle"></h2><p id="celebMsg"></p><button class="btn" onclick="closeCeleb()">やったー！🎉</button></div></div>
+<div style="text-align:center;padding:20px 16px 4px;color:#7A6A5E;font-size:12px;line-height:1.8">作：<a href="https://x.com/mervick71" target="_blank" rel="noopener" style="color:#7A6A5E">アキノ診療所</a> ・ <a href="https://akinoclinic.gumroad.com" target="_blank" rel="noopener" style="color:#7A6A5E">Gumroad</a></div>
 <div class="confetti" id="confetti"></div><div class="toast" id="toast"></div>
 
 <script>
@@ -759,5 +767,6 @@ var ms=document.getElementById('monthSel');for(var i=1;i<=12;i++){var o=document
 renderAll();
 try{if(sessionStorage.getItem('kondate-migrated')==='1'){sessionStorage.removeItem('kondate-migrated');setTimeout(function(){toast('引っ越しが完了しました 🎉')},350)}}catch(e){}
 </script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})});}</script>
 </body>
 </html>
